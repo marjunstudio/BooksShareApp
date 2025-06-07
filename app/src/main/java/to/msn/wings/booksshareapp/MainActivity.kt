@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import to.msn.wings.booksshareapp.navigation.Screen
 import to.msn.wings.booksshareapp.ui.components.BottomNavigation
+import to.msn.wings.booksshareapp.ui.components.TopBar
 import to.msn.wings.booksshareapp.ui.home.HomeScreen
 import to.msn.wings.booksshareapp.ui.profile.ProfileScreen
 import to.msn.wings.booksshareapp.ui.theme.BooksShareAppTheme
@@ -43,6 +44,7 @@ fun BooksShareApp() {
     val navController = rememberNavController()
 
     Scaffold(
+        topBar = { TopBar(navController = navController) },
         bottomBar = { BottomNavigation(navController = navController) }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {

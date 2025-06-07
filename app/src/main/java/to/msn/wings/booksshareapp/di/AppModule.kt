@@ -2,6 +2,9 @@ package to.msn.wings.booksshareapp.di
 
 import android.content.Context
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -31,6 +34,14 @@ object AppModule {
             "books_db"
         ).build()
     }
+
+    @Provides
+    @Singleton
+    fun provideBookDao(db: AppDatabase) = db.bookDao()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
 
     @Provides
     @Singleton
