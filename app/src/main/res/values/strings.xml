@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BooksShareApp</string>
+    <!-- ナビゲーション -->
+    <string name="nav_home">ホーム</string>
+    <string name="nav_myPage">マイページ</string>
+    <string name="nav_search">書籍検索</string>
 </resources>
