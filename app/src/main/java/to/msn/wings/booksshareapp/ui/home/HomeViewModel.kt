@@ -36,8 +36,8 @@ class HomeViewModel @Inject constructor(
 
     val books: StateFlow<List<BookEntity>> = combine(_books, _sortOrder) { books, sortOrder ->
         when (sortOrder) {
-            SortOrder.NEWEST_FIRST -> books.sortedByDescending { it.readDate }
-            SortOrder.OLDEST_FIRST -> books.sortedBy { it.readDate }
+            SortOrder.NEWEST_FIRST -> books.sortedByDescending { it.regDate }
+            SortOrder.OLDEST_FIRST -> books.sortedBy { it.regDate }
             SortOrder.TITLE_ASC -> books.sortedBy { it.title }
             SortOrder.TITLE_DESC -> books.sortedByDescending { it.title }
         }

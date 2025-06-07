@@ -6,8 +6,11 @@ import to.msn.wings.booksshareapp.data.local.entity.BookEntity
 
 @Dao
 interface BookDao {
-    @Query("SELECT * FROM books WHERE userId = :userId ORDER BY readDate DESC")
+    @Query("SELECT * FROM books WHERE userId = :userId ORDER BY regDate DESC")
     fun getAllBooks(userId: String): Flow<List<BookEntity>>
+
+    @Query("SELECT * FROM books WHERE bookId = :bookId AND userId = :userId LIMIT 1")
+    suspend fun getBookById(bookId: String, userId: String): BookEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBook(book: BookEntity)
@@ -15,6 +18,6 @@ interface BookDao {
     @Delete
     suspend fun deleteBook(book: BookEntity)
 
-    @Query("SELECT * FROM books WHERE bookId = :bookId AND userId = :userId")
-    suspend fun getBookById(bookId: String, userId: String): BookEntity?
+    @Update
+    suspend fun updateBook(book: BookEntity)
 } 

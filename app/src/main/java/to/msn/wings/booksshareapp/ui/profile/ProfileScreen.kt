@@ -53,18 +53,14 @@ fun ProfileScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        Log.d("ProfileScreen", "Result code: ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {  // -1が成功コード
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
-                Log.d("ProfileScreen", "Google sign in result received")
                 val account = task.getResult(ApiException::class.java)
                 account?.idToken?.let { token ->
-                    Log.d("ProfileScreen", "Google sign in successful, token received")
                     val credential = GoogleAuthProvider.getCredential(token, null)
                     viewModel.signInWithCredential(credential)
                 } ?: run {
-                    Log.e("ProfileScreen", "Google sign in failed: No ID token")
                     context.showToast("ログインに失敗しました: トークンが取得できません")
                 }
             } catch (e: ApiException) {
@@ -72,7 +68,6 @@ fun ProfileScreen(
                 context.showToast("ログインに失敗しました: ${e.message}")
             }
         } else {
-            Log.d("ProfileScreen", "Google sign in cancelled with code: ${result.resultCode}")
             context.showToast("ログインがキャンセルされました")
         }
     }
