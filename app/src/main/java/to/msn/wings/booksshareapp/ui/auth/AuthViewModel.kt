@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,12 +23,16 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     private val _authState = MutableStateFlow(AuthState())
     val authState: StateFlow<AuthState> = _authState
 
+    private val _currentUser = MutableStateFlow<FirebaseUser?>(null)
+    val currentUser: StateFlow<FirebaseUser?> = _currentUser
+
     init {
         auth.currentUser?.let { user ->
             _authState.value = AuthState(
                 isAuthenticated = true,
                 userId = user.uid
             )
+            _currentUser.value = user
             Log.d("AuthViewModel", "Current user found: ${user.uid}")
         } ?: run {
             Log.d("AuthViewModel", "No current user")
@@ -45,12 +50,14 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                         isAuthenticated = true,
                         userId = user.uid
                     )
+                    _currentUser.value = user
                 } ?: run {
                     Log.e("AuthViewModel", "Sign in failed: No user returned")
                     _authState.value = AuthState(
                         isAuthenticated = false,
                         error = "ログインに失敗しました"
                     )
+                    _currentUser.value = null
                 }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Sign in error", e)
@@ -58,6 +65,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                     isAuthenticated = false,
                     error = "ログインエラー: ${e.message}"
                 )
+                _currentUser.value = null
             }
         }
     }
@@ -67,6 +75,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
             auth.signOut()
             Log.d("AuthViewModel", "Sign out successful")
             _authState.value = AuthState()
+            _currentUser.value = null
         } catch (e: Exception) {
             Log.e("AuthViewModel", "Sign out error", e)
             _authState.value = AuthState(

@@ -16,6 +16,7 @@ fun TopBar(
     val title = when (currentRoute) {
         Screen.Home.route -> "ホーム"
         Screen.Profile.route -> "マイページ"
+        Screen.Search.route -> "書籍登録"
         else -> "BooksShare"
     }
 

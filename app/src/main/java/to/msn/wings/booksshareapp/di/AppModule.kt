@@ -16,7 +16,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import to.msn.wings.booksshareapp.data.local.AppDatabase
+import to.msn.wings.booksshareapp.data.local.dao.BookDao
 import to.msn.wings.booksshareapp.data.remote.GoogleBooksApi
+import to.msn.wings.booksshareapp.data.repository.BookRepository
 import javax.inject.Singleton
 
 @Module
@@ -31,13 +33,15 @@ object AppModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "books_db"
+            "books_database"
         ).build()
     }
 
     @Provides
     @Singleton
-    fun provideBookDao(db: AppDatabase) = db.bookDao()
+    fun provideBookDao(database: AppDatabase): BookDao {
+        return database.bookDao()
+    }
 
     @Provides
     @Singleton
@@ -60,5 +64,11 @@ object AppModule {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(GoogleBooksApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBookRepository(bookDao: BookDao): BookRepository {
+        return BookRepository(bookDao)
     }
 } 
