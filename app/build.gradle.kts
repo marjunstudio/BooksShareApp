@@ -1,9 +1,17 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    load(FileInputStream(rootProject.file("local.properties")))
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -21,6 +29,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Web Client IDをBuildConfigに追加
+        buildConfigField("String", "WEB_CLIENT_ID", "\"${localProperties["web.client.id"]}\"")
     }
 
     buildTypes {
@@ -41,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -87,9 +99,14 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    // Firebase/Google Auth
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
-    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
     // Image Loading
