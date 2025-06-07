@@ -2,17 +2,18 @@ package to.msn.wings.booksshareapp.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +24,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import to.msn.wings.booksshareapp.data.local.entity.BookEntity
 
 @Composable
@@ -63,9 +66,12 @@ fun HomeScreen(
                         .align(Alignment.Center)
                 )
             } else {
-                // 書籍一覧の表示
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                // 書籍一覧をグリッド表示
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(books) { book ->
                         BookItem(book = book)
@@ -79,34 +85,22 @@ fun HomeScreen(
 @Composable
 fun BookItem(book: BookEntity) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(0.7f), // 本の表紙の一般的なアスペクト比
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
         onClick = { /* TODO: 詳細画面への遷移 */ }
     ) {
-        Column(
+        // 書籍の表紙画像
+        AsyncImage(
+            model = book.thumbnailUrl,
+            contentDescription = book.title,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = book.title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            book.authors?.let { authors ->
-                Text(
-                    text = authors,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = "読了日: ${book.readDate}",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+                .weight(1f)
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
     }
 } 
