@@ -34,6 +34,7 @@ import to.msn.wings.booksshareapp.ui.components.TopBar
 import to.msn.wings.booksshareapp.ui.detail.BookDetailScreen
 import to.msn.wings.booksshareapp.ui.home.HomeScreen
 import to.msn.wings.booksshareapp.ui.profile.ProfileScreen
+import to.msn.wings.booksshareapp.ui.record.BookRecordScreen
 import to.msn.wings.booksshareapp.ui.search.SearchScreen
 import to.msn.wings.booksshareapp.ui.theme.BooksShareAppTheme
 import java.net.URLDecoder
@@ -92,6 +93,9 @@ fun BooksShareApp() {
                     HomeScreen(
                         onNavigateToSearch = {
                             navController.navigate(Screen.Search.route)
+                        },
+                        onNavigateToRecord = { bookId ->
+                            navController.navigate(Screen.BookRecord.createRoute(bookId))
                         }
                     )
                 }
@@ -130,6 +134,21 @@ fun BooksShareApp() {
                                 popUpTo(Screen.Home.route) { inclusive = true }
                             }
                         }
+                    )
+                }
+
+                composable(
+                    route = Screen.BookRecord.route,
+                    arguments = listOf(
+                        navArgument("bookId") {
+                            type = NavType.StringType
+                        }
+                    )
+                ) { backStackEntry ->
+                    val bookId = backStackEntry.arguments?.getString("bookId") ?: return@composable
+                    BookRecordScreen(
+                        bookId = bookId,
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
             }
