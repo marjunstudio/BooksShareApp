@@ -29,7 +29,7 @@ fun TopBar(
 
     TopAppBar(
         navigationIcon = {
-            if (currentRoute != Screen.Home.route) {
+            if (currentRoute != Screen.Home.route || currentRoute != Screen.Profile.route) {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,

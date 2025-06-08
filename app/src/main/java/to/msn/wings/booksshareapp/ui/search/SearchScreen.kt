@@ -52,11 +52,9 @@ fun SearchScreen(
             // 検索バー
             TextField(
                 value = searchQuery,
-                onValueChange = {
-                    searchQuery = it
-                },
-                modifier = Modifier
-                    .padding(16.dp),
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.padding(16.dp),
+                singleLine = true,
                 placeholder = { Text("書籍を検索") }
             )
             Button(

@@ -1,5 +1,7 @@
 package to.msn.wings.booksshareapp.ui.detail
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,7 @@ class BookDetailViewModel @Inject constructor(
     private val _saveBookStatus = MutableStateFlow<SaveBookStatus?>(null)
     val saveBookStatus: StateFlow<SaveBookStatus?> = _saveBookStatus
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveBook(book: VolumeInfo, userId: String) {
         viewModelScope.launch {
             try {
