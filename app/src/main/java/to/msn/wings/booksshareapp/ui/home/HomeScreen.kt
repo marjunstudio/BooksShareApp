@@ -23,7 +23,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,7 +55,6 @@ enum class SortOrder {
     TITLE_DESC
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onNavigateToSearch: () -> Unit,
@@ -129,67 +127,67 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // 並び替えメニュー
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp)
-            ) {
-                Row(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
+            if (books.isNotEmpty()) {
+                // 並び替えメニュー
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp)
                 ) {
-                    Text(
-                        text = when (currentSortOrder) {
-                            SortOrder.NEWEST_FIRST -> "新しい順"
-                            SortOrder.OLDEST_FIRST -> "古い順"
-                            SortOrder.TITLE_ASC -> "タイトル昇順"
-                            SortOrder.TITLE_DESC -> "タイトル降順"
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Box {
-                        IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.Default.Sort, "並び替え")
-                        }
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = when (currentSortOrder) {
+                                SortOrder.NEWEST_FIRST -> "新しい順"
+                                SortOrder.OLDEST_FIRST -> "古い順"
+                                SortOrder.TITLE_ASC -> "タイトル昇順"
+                                SortOrder.TITLE_DESC -> "タイトル降順"
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Box {
+                            IconButton(onClick = { showSortMenu = true }) {
+                                Icon(Icons.Default.Sort, "並び替え")
+                            }
 
-                        DropdownMenu(
-                            expanded = showSortMenu,
-                            onDismissRequest = { showSortMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("新しい順") },
-                                onClick = {
-                                    currentSortOrder = SortOrder.NEWEST_FIRST
-                                    viewModel.setSortOrder(SortOrder.NEWEST_FIRST)
-                                    showSortMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("古い順") },
-                                onClick = {
-                                    currentSortOrder = SortOrder.OLDEST_FIRST
-                                    viewModel.setSortOrder(SortOrder.OLDEST_FIRST)
-                                    showSortMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("タイトル昇順") },
-                                onClick = {
-                                    currentSortOrder = SortOrder.TITLE_ASC
-                                    viewModel.setSortOrder(SortOrder.TITLE_ASC)
-                                    showSortMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("タイトル降順") },
-                                onClick = {
-                                    currentSortOrder = SortOrder.TITLE_DESC
-                                    viewModel.setSortOrder(SortOrder.TITLE_DESC)
-                                    showSortMenu = false
-                                }
-                            )
+                            DropdownMenu(
+                                expanded = showSortMenu,
+                                onDismissRequest = { showSortMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("新しい順") },
+                                    onClick = {
+                                        currentSortOrder = SortOrder.NEWEST_FIRST
+                                        viewModel.setSortOrder(SortOrder.NEWEST_FIRST)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("古い順") },
+                                    onClick = {
+                                        currentSortOrder = SortOrder.OLDEST_FIRST
+                                        viewModel.setSortOrder(SortOrder.OLDEST_FIRST)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("タイトル昇順") },
+                                    onClick = {
+                                        currentSortOrder = SortOrder.TITLE_ASC
+                                        viewModel.setSortOrder(SortOrder.TITLE_ASC)
+                                        showSortMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("タイトル降順") },
+                                    onClick = {
+                                        currentSortOrder = SortOrder.TITLE_DESC
+                                        viewModel.setSortOrder(SortOrder.TITLE_DESC)
+                                        showSortMenu = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
