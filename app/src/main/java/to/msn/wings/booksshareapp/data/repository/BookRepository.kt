@@ -23,7 +23,6 @@ class BookRepository @Inject constructor(
             userId = userId,
             title = volumeInfo.volumeInfo.title,
             authors = volumeInfo.volumeInfo.authors?.joinToString(", "),
-            description = volumeInfo.volumeInfo.description,
             thumbnailUrl = volumeInfo.volumeInfo.imageLinks?.thumbnail?.replace("http:", "https:"),
             impressiveQuote = null,
             trigger = null,

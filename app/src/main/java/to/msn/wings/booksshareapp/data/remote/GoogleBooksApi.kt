@@ -31,7 +31,6 @@ data class BookInfo(
     val averageRating: Double? = null,
     val ratingsCount: Int? = null,
     val language: String? = null,
-    val description: String? = null,
     val publisher: String? = null,
     val publishedDate: String? = null,
     val industryIdentifiers: List<IndustryIdentifier>? = null
