@@ -2,7 +2,9 @@ package to.msn.wings.booksshareapp.ui.record
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -13,15 +15,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import to.msn.wings.booksshareapp.data.local.entity.BookEntity
 import to.msn.wings.booksshareapp.ui.auth.AuthViewModel
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -105,38 +115,22 @@ fun BookRecordScreen(
 
             Divider()
 
-            // 読書期間
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "読書期間",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "開始日: ${bookEntity.readStartDate?.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")) ?: "未設定"}",
-                            style = MaterialTheme.typography.bodyMedium
+            // 読書期間セクションを更新
+            ReadPeriodSection(
+                bookEntity = bookEntity,
+                onEditClick = {
+                    editTarget = EditTarget.ReadPeriod
+                    showEditDialog = true
+                },
+                onDeleteClick = {
+                    viewModel.updateBook(
+                        bookEntity.copy(
+                            readStartDate = null,
+                            readEndDate = null
                         )
-                        Text(
-                            text = "終了日: ${bookEntity.readEndDate?.format(DateTimeFormatter.ofPattern("yyyy/MM/dd")) ?: "未設定"}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    IconButton(onClick = {
-                        editTarget = EditTarget.ReadPeriod
-                        showEditDialog = true
-                    }) {
-                        Icon(Icons.Default.Edit, contentDescription = "読書期間を編集")
-                    }
+                    )
                 }
-            }
+            )
 
             Divider()
 
@@ -167,7 +161,7 @@ fun BookRecordScreen(
                 )
             }
 
-            Divider()
+            HorizontalDivider()
 
             // 読もうと思ったきっかけ
             Column(
@@ -221,6 +215,174 @@ enum class EditTarget {
     Trigger
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun ReadPeriodSection(
+    bookEntity: BookEntity,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "読書期間",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = when {
+                    bookEntity.readStartDate != null && bookEntity.readEndDate != null -> {
+                        "${bookEntity.readStartDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))} 〜 ${bookEntity.readEndDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}"
+                    }
+                    bookEntity.readStartDate != null -> {
+                        bookEntity.readStartDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+                    }
+                    else -> "未設定"
+                },
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Row {
+                if (bookEntity.readStartDate != null) {
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "読書期間を削除"
+                        )
+                    }
+                }
+                IconButton(onClick = onEditClick) {
+                    Icon(Icons.Default.Edit, contentDescription = "読書期間を編集")
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DateRangePickerDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (startDate: LocalDate?, endDate: LocalDate?) -> Unit,
+    initialStartDate: LocalDate?,
+    initialEndDate: LocalDate?
+) {
+    val dateRangePickerState = rememberDateRangePickerState(
+        initialSelectedStartDateMillis = initialStartDate?.atStartOfDay()?.toEpochSecond(java.time.ZoneOffset.UTC)?.times(1000),
+        initialSelectedEndDateMillis = initialEndDate?.atStartOfDay()?.toEpochSecond(java.time.ZoneOffset.UTC)?.times(1000)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f))
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // ヘッダー
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 3.dp
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "読書期間を選択",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Row {
+                            TextButton(onClick = onDismiss) {
+                                Text("キャンセル")
+                            }
+                            TextButton(
+                                onClick = {
+                                    val startDate = dateRangePickerState.selectedStartDateMillis?.let {
+                                        LocalDate.ofEpochDay(it / (24 * 60 * 60 * 1000))
+                                    }
+                                    val endDate = dateRangePickerState.selectedEndDateMillis?.let {
+                                        LocalDate.ofEpochDay(it / (24 * 60 * 60 * 1000))
+                                    }
+                                    onConfirm(startDate, endDate)
+                                }
+                            ) {
+                                Text("保存")
+                            }
+                        }
+                    }
+                }
+
+                // DateRangePicker
+                DateRangePicker(
+                    state = dateRangePickerState,
+                    title = null,
+                    headline = null,
+                    showModeToggle = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = DatePickerDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                )
+
+                // 選択された期間の表示
+                dateRangePickerState.selectedStartDateMillis?.let { startMillis ->
+                    val startDate = LocalDate.ofEpochDay(startMillis / (24 * 60 * 60 * 1000))
+                    val endDate = dateRangePickerState.selectedEndDateMillis?.let { 
+                        LocalDate.ofEpochDay(it / (24 * 60 * 60 * 1000))
+                    }
+
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 3.dp
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = when {
+                                    endDate != null -> "選択期間: ${startDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))} 〜 ${endDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}"
+                                    else -> "選択日: ${startDate.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))}"
+                                },
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+
+                            // クリアボタン
+                            TextButton(
+                                onClick = { dateRangePickerState.setSelection(null, null) },
+                                modifier = Modifier.align(Alignment.End)
+                            ) {
+                                Text("選択をクリア")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditDialog(
     book: BookEntity?,
@@ -231,72 +393,80 @@ fun EditDialog(
     book?.let { currentBook ->
         var impressiveQuote by remember { mutableStateOf(currentBook.impressiveQuote ?: "") }
         var trigger by remember { mutableStateOf(currentBook.trigger ?: "") }
-        var readStartDate by remember { mutableStateOf(currentBook.readStartDate) }
-        var readEndDate by remember { mutableStateOf(currentBook.readEndDate) }
 
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            title = {
-                Text(
-                    when (editTarget) {
-                        EditTarget.ReadPeriod -> "読書期間を編集"
-                        EditTarget.ImpressiveQuote -> "読書メモを編集"
-                        EditTarget.Trigger -> "きっかけを編集"
+        when (editTarget) {
+            EditTarget.ReadPeriod -> {
+                DateRangePickerDialog(
+                    onDismiss = onDismiss,
+                    onConfirm = { startDate, endDate ->
+                        val updatedBook = currentBook.copy(
+                            readStartDate = startDate,
+                            readEndDate = endDate
+                        )
+                        onSave(updatedBook)
+                    },
+                    initialStartDate = currentBook.readStartDate,
+                    initialEndDate = currentBook.readEndDate
+                )
+            }
+            else -> {
+                AlertDialog(
+                    onDismissRequest = onDismiss,
+                    title = {
+                        Text(
+                            when (editTarget) {
+                                EditTarget.ImpressiveQuote -> "読書メモを編集"
+                                EditTarget.Trigger -> "きっかけを編集"
+                                else -> ""
+                            }
+                        )
+                    },
+                    text = {
+                        when (editTarget) {
+                            EditTarget.ImpressiveQuote -> {
+                                OutlinedTextField(
+                                    value = impressiveQuote,
+                                    onValueChange = { impressiveQuote = it },
+                                    label = { Text("読書メモ") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            EditTarget.Trigger -> {
+                                OutlinedTextField(
+                                    value = trigger,
+                                    onValueChange = { trigger = it },
+                                    label = { Text("きっかけ") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            else -> {}
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                val updatedBook = when (editTarget) {
+                                    EditTarget.ImpressiveQuote -> currentBook.copy(
+                                        impressiveQuote = impressiveQuote.takeIf { it.isNotBlank() }
+                                    )
+                                    EditTarget.Trigger -> currentBook.copy(
+                                        trigger = trigger.takeIf { it.isNotBlank() }
+                                    )
+                                    else -> currentBook
+                                }
+                                onSave(updatedBook)
+                            }
+                        ) {
+                            Text("保存")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = onDismiss) {
+                            Text("キャンセル")
+                        }
                     }
                 )
-            },
-            text = {
-                when (editTarget) {
-                    EditTarget.ReadPeriod -> {
-                        Column {
-                            // 読書期間の編集UI（DatePickerなど）を実装
-                            Text("読書期間の編集UIをここに実装")
-                        }
-                    }
-                    EditTarget.ImpressiveQuote -> {
-                        OutlinedTextField(
-                            value = impressiveQuote,
-                            onValueChange = { impressiveQuote = it },
-                            label = { Text("読書メモ") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    EditTarget.Trigger -> {
-                        OutlinedTextField(
-                            value = trigger,
-                            onValueChange = { trigger = it },
-                            label = { Text("きっかけ") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val updatedBook = when (editTarget) {
-                            EditTarget.ReadPeriod -> currentBook.copy(
-                                readStartDate = readStartDate,
-                                readEndDate = readEndDate
-                            )
-                            EditTarget.ImpressiveQuote -> currentBook.copy(
-                                impressiveQuote = impressiveQuote.takeIf { it.isNotBlank() }
-                            )
-                            EditTarget.Trigger -> currentBook.copy(
-                                trigger = trigger.takeIf { it.isNotBlank() }
-                            )
-                        }
-                        onSave(updatedBook)
-                    }
-                ) {
-                    Text("保存")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismiss) {
-                    Text("キャンセル")
-                }
             }
-        )
+        }
     }
 } 

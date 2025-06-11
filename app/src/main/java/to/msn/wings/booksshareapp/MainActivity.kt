@@ -65,9 +65,17 @@ fun BooksShareApp() {
     val authViewModel: AuthViewModel = hiltViewModel()
     val currentUser by authViewModel.currentUser.collectAsState()
 
+    // ボトムナビゲーションを表示するルートのリスト
+    val showBottomNavRoutes = listOf(Screen.Home.route, Screen.Profile.route)
+    val shouldShowBottomNav = currentRoute in showBottomNavRoutes
+
     Scaffold(
         topBar = { TopBar(navController = navController) },
-        bottomBar = { BottomNavigation(navController = navController) },
+        bottomBar = { 
+            if (shouldShowBottomNav) {
+                BottomNavigation(navController = navController)
+            }
+        },
         floatingActionButton = {
             // ホーム画面でのみFABを表示
             if (currentRoute == Screen.Home.route) {
