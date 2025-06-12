@@ -39,6 +39,7 @@ fun ProfileScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.authState.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
 
     // Google Sign-In の設定
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -53,13 +54,14 @@ fun ProfileScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {  // -1が成功コード
+        if (result.resultCode == Activity.RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
                 account?.idToken?.let { token ->
                     val credential = GoogleAuthProvider.getCredential(token, null)
                     viewModel.signInWithCredential(credential)
+                    context.showToast("ログインしました")
                 } ?: run {
                     context.showToast("ログインに失敗しました: トークンが取得できません")
                 }
@@ -72,12 +74,6 @@ fun ProfileScreen(
         }
     }
 
-    LaunchedEffect(state.isAuthenticated) {
-        if (state.isAuthenticated) {
-            context.showToast("ログインしました")
-        }
-    }
-
     LaunchedEffect(state.error) {
         state.error?.let { error ->
             context.showToast(error)
@@ -85,9 +81,7 @@ fun ProfileScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -96,10 +90,17 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             if (state.isAuthenticated) {
-                Text(
-                    text = "ログイン中",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                currentUser?.let { user ->
+                    Text(
+                        text = "ユーザーID: ${user.uid}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "メールアドレス: ${user.email}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
@@ -113,13 +114,6 @@ fun ProfileScreen(
                     Text("ログアウト")
                 }
             } else {
-                Text(
-                    text = "ログインしていません",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                
-                Spacer(modifier = Modifier.height(32.dp))
-                
                 Button(
                     onClick = {
                         launcher.launch(googleSignInClient.signInIntent)
