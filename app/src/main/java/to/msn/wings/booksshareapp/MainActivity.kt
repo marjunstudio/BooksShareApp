@@ -34,6 +34,7 @@ import to.msn.wings.booksshareapp.ui.components.TopBar
 import to.msn.wings.booksshareapp.ui.detail.BookDetailScreen
 import to.msn.wings.booksshareapp.ui.home.HomeScreen
 import to.msn.wings.booksshareapp.ui.profile.ProfileScreen
+import to.msn.wings.booksshareapp.ui.reading.ReadingRecordScreen
 import to.msn.wings.booksshareapp.ui.record.BookRecordScreen
 import to.msn.wings.booksshareapp.ui.search.SearchScreen
 import to.msn.wings.booksshareapp.ui.theme.BooksShareAppTheme
@@ -66,7 +67,7 @@ fun BooksShareApp() {
     val currentUser by authViewModel.currentUser.collectAsState()
 
     // ボトムナビゲーションを表示するルートのリスト
-    val showBottomNavRoutes = listOf(Screen.Home.route, Screen.Profile.route)
+    val showBottomNavRoutes = listOf(Screen.Home.route, Screen.Profile.route, Screen.ReadingRecord.route)
     val shouldShowBottomNav = currentRoute in showBottomNavRoutes
 
     Scaffold(
@@ -110,6 +111,10 @@ fun BooksShareApp() {
 
                 composable(Screen.Profile.route) {
                     ProfileScreen()
+                }
+
+                composable(Screen.ReadingRecord.route) {
+                    ReadingRecordScreen()
                 }
 
                 composable(Screen.Search.route) {

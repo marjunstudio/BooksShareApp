@@ -6,6 +6,7 @@ sealed class Screen(val route: String) {
     object AddBook : Screen("add_book")
     object Profile : Screen("profile")
     object Search : Screen("search")
+    object ReadingRecord : Screen("reading_record")
     object BookDetail : Screen("book_detail/{bookJson}") {
         fun createRoute(bookJson: String) = "book_detail/$bookJson"
     }
