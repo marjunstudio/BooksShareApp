@@ -3,6 +3,7 @@ package to.msn.wings.booksshareapp.ui.reading
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,7 +67,25 @@ fun ReadingRecordScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // カレンダー
-        Calendar(state.calendarDays)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = { },
+                        onHorizontalDrag = { change, dragAmount ->
+                            change.consume()
+                            if (dragAmount > 50) {
+                                viewModel.updateMonth(-1)
+                            } else if (dragAmount < -50) {
+                                viewModel.updateMonth(1)
+                            }
+                        }
+                    )
+                }
+        ) {
+            Calendar(state.calendarDays)
+        }
 
         if (state.isLoading) {
             Box(
@@ -94,12 +114,17 @@ fun Calendar(calendarDays: List<CalendarDay>) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            listOf("日", "月", "火", "水", "木", "金", "土").forEach { day ->
+            listOf("日", "月", "火", "水", "木", "金", "土").forEachIndexed { index, day ->
                 Text(
                     text = day,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = when (index) {
+                        0 -> Color.Red
+                        6 -> Color.Blue
+                        else -> MaterialTheme.colorScheme.onSurface
+                    }
                 )
             }
         }
@@ -113,6 +138,8 @@ fun Calendar(calendarDays: List<CalendarDay>) {
         ) {
             items(calendarDays.size) { index ->
                 val day = calendarDays[index]
+                val isWeekend = index % 7 == 0 || index % 7 == 6
+                
                 Box(
                     modifier = Modifier
                         .aspectRatio(1f)
@@ -129,8 +156,12 @@ fun Calendar(calendarDays: List<CalendarDay>) {
                     Text(
                         text = day.day.toString(),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (day.isCurrentMonth) MaterialTheme.colorScheme.onSurface
-                               else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        color = when {
+                            !day.isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            isWeekend && index % 7 == 0 -> Color.Red
+                            isWeekend && index % 7 == 6 -> Color.Blue
+                            else -> MaterialTheme.colorScheme.onSurface
+                        }
                     )
                 }
             }

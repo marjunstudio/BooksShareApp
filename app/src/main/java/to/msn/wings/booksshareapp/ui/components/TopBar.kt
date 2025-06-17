@@ -24,12 +24,15 @@ fun TopBar(
         Screen.Profile.route -> R.string.nav_myPage
         Screen.Search.route -> R.string.nav_search
         Screen.BookDetail.route -> R.string.book_detail
+        Screen.ReadingRecord.route -> R.string.nav_reading_record
         else -> R.string.app_name
     }
 
     TopAppBar(
         navigationIcon = {
-            if (currentRoute != Screen.Home.route && currentRoute != Screen.Profile.route) {
+            if (currentRoute != Screen.Home.route && 
+                currentRoute != Screen.Profile.route && 
+                currentRoute != Screen.ReadingRecord.route) {
                 IconButton(onClick = { navController.navigateUp() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
