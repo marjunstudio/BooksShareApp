@@ -1,0 +1,41 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ビルド設定ガイド
+
+## Gradle設定
+
+このプロジェクトはKotlin DSLを使用したGradleビルドシステムを採用しています。
+
+### 主要なビルドファイル
+
+- [app/build.gradle.kts](mdc:app/build.gradle.kts)
+  - アプリケーションの依存関係
+  - ビルド設定
+  - アプリケーション固有の設定
+
+- [build.gradle.kts](mdc:build.gradle.kts)
+  - プロジェクト全体の依存関係
+  - ビルドツールの設定
+  - 共通のビルド設定
+
+### ビルドコマンド
+
+プロジェクトのビルドには以下のコマンドを使用します：
+
+```bash
+# プロジェクトのビルド
+./gradlew build
+
+# アプリケーションのインストール
+./gradlew installDebug
+
+# クリーンビルド
+./gradlew clean build
+```
+
+## 依存関係管理
+
+依存関係は`app/build.gradle.kts`で管理されています。新しいライブラリを追加する場合は、このファイルを編集してください。

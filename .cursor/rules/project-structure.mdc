@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# BooksShareApp プロジェクト構造
+
+このプロジェクトはAndroidアプリケーションで、書籍の共有機能を提供します。
+
+## 主要ディレクトリ構造
+
+- `app/`: アプリケーションのメインコードが含まれるディレクトリ
+  - `src/`: ソースコード
+  - `build.gradle.kts`: アプリケーションのビルド設定
+  - `google-services.json`: Firebase設定ファイル
+
+- `gradle/`: Gradleラッパーの設定ファイル
+- `build.gradle.kts`: プロジェクト全体のビルド設定
+- `settings.gradle.kts`: プロジェクト設定ファイル
+
+## 重要なファイル
+
+- [app/build.gradle.kts](mdc:app/build.gradle.kts): アプリケーションの依存関係とビルド設定
+- [build.gradle.kts](mdc:build.gradle.kts): プロジェクト全体のビルド設定
+- [settings.gradle.kts](mdc:settings.gradle.kts): プロジェクトのモジュール設定
